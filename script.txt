@@ -1,36 +1,72 @@
-local player = game.Players.LocalPlayer
-local flying = false
+-- Sebax Hub - Painel flutuante, arrastável, botão float, voo com Q
 
+local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
 
-function canPlayerFly()
-    local leaderstats = player:FindFirstChild("leaderstats")
-    return leaderstats and leaderstats:FindFirstChild("CanFly") and leaderstats.CanFly.Value
-end
+-- Criando GUI
+local ScreenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+ScreenGui.Name = "SebaxHub"
 
-function setFlying(on)
-    flying = on
-    local char = player.Character
-    if char then
-        local humanoid = char:FindFirstChildOfClass("Humanoid")
-        if humanoid then
-            humanoid.PlatformStand = flying
-        end
-    end
-end
+local Frame = Instance.new("Frame", ScreenGui)
+Frame.Size = UDim2.new(0, 250, 0, 120)
+Frame.Position = UDim2.new(0.5, -125, 0.5, -60)
+Frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Frame.BorderSizePixel = 0
+Frame.Name = "Main"
+Frame.Active = true
+Frame.Draggable = true -- Painel arrastável
+
+local UICorner = Instance.new("UICorner", Frame)
+UICorner.CornerRadius = UDim.new(0, 18) -- Bordas arredondadas
+
+local Title = Instance.new("TextLabel", Frame)
+Title.Text = "Sebax Hub"
+Title.Size = UDim2.new(1, 0, 0, 32)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.Font = Enum.Font.GothamBold
+Title.TextScaled = true
+
+local Button = Instance.new("TextButton", Frame)
+Button.Text = "Float"
+Button.Size = UDim2.new(0.7, 0, 0, 40)
+Button.Position = UDim2.new(0.15, 0, 0, 50)
+Button.BackgroundColor3 = Color3.fromRGB(80, 160, 255)
+Button.TextColor3 = Color3.fromRGB(255,255,255)
+Button.Font = Enum.Font.GothamBold
+Button.TextScaled = true
+
+local ButtonCorner = Instance.new("UICorner", Button)
+ButtonCorner.CornerRadius = UDim.new(0, 10)
+
+local flyingEnabled = false
+
+-- Função para ativar float (voo com Q)
+Button.MouseButton1Click:Connect(function()
+    flyingEnabled = true
+    Button.Text = "Float (Ativado)"
+    Button.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
+end)
 
 UserInputService.InputBegan:Connect(function(input, processed)
     if processed then return end
-    if input.KeyCode == Enum.KeyCode.Q and canPlayerFly() then
-        setFlying(not flying)
+    if input.KeyCode == Enum.KeyCode.Q and flyingEnabled then
+        local character = player.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.PlatformStand = not humanoid.PlatformStand
+            end
+        end
     end
 end)
 
 UserInputService.JumpRequest:Connect(function()
-    if flying then
-        local char = player.Character
-        if char then
-            local root = char:FindFirstChild("HumanoidRootPart")
+    if flyingEnabled then
+        local character = player.Character
+        if character then
+            local root = character:FindFirstChild("HumanoidRootPart")
             if root then
                 root.Velocity = Vector3.new(0, 50, 0)
             end
