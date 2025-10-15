@@ -1,6 +1,4 @@
 local player = game.Players.LocalPlayer
-local char = script.Parent
-local humanoid = char:WaitForChild("Humanoid")
 local flying = false
 
 local UserInputService = game:GetService("UserInputService")
@@ -12,7 +10,13 @@ end
 
 function setFlying(on)
     flying = on
-    humanoid.PlatformStand = flying
+    local char = player.Character
+    if char then
+        local humanoid = char:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.PlatformStand = flying
+        end
+    end
 end
 
 UserInputService.InputBegan:Connect(function(input, processed)
@@ -24,9 +28,12 @@ end)
 
 UserInputService.JumpRequest:Connect(function()
     if flying then
-        local root = char:FindFirstChild("HumanoidRootPart")
-        if root then
-            root.Velocity = Vector3.new(0, 50, 0)
+        local char = player.Character
+        if char then
+            local root = char:FindFirstChild("HumanoidRootPart")
+            if root then
+                root.Velocity = Vector3.new(0, 50, 0)
+            end
         end
     end
 end)
